@@ -4,14 +4,12 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        // reset parameters
         this.barrierSpeed = -450;
         this.barrierSpeedMax = -3000;
         level = 0;
         this.extremeMODE = false;
         this.shadowLock = false;
 
-        // set up audio, play bgm
         this.bgm = this.sound.add('GameMusic', { 
             mute: false,
             volume: 1,
@@ -22,7 +20,6 @@ class Play extends Phaser.Scene {
 
         this.BGStarRunner = this.add.tileSprite(0, 0, 1024, 700 , 'BGStarRunner').setOrigin(0, 0);
 
-        // add snapshot image from prior Scene
         if (this.textures.exists('titlesnapshot')) {
             let titleSnap = this.add.image(centerX, centerY, 'titlesnapshot').setOrigin(0.5);
             this.tweens.add({
@@ -36,29 +33,23 @@ class Play extends Phaser.Scene {
             console.log('texture error');
         }
 
- 
-
-        // set up player paddle (physics sprite) and set properties
         star = this.physics.add.sprite(32, centerY, 'ShootingStar').setOrigin(0.5);
         star.setCollideWorldBounds(true);
         star.setBounce(0);
         star.setImmovable();
         star.setMaxVelocity(0, 2000);
         star.setDragY(200);
-        star.setDepth(1);             // ensures that paddle z-depth remains above shadow paddles
-        star.destroyed = false;       // custom property to track paddle life
-        star.setBlendMode('SCREEN');  // set a WebGL blend mode
-
-        // set up barrier group
+        star.setDepth(1);            
+        star.destroyed = false;       
+        star.setBlendMode('SCREEN');  
+        
         this.barrierGroup = this.add.group({
-            runChildUpdate: true    // make sure update runs on group children
+            runChildUpdate: true   
         });
-        // wait a few seconds before spawning barriers
         this.time.delayedCall(2500, () => { 
             this.addBarrier(); 
         });
 
-        // set up difficulty timer (triggers callback every second)
         this.difficultyTimer = this.time.addEvent({
             delay: 1000,
             callback: this.levelBump,
@@ -66,11 +57,9 @@ class Play extends Phaser.Scene {
             loop: true
         });
 
-        // set up cursor keys
         cursors = this.input.keyboard.createCursorKeys();
     }
 
-    // create new barriers and add them to existing barrier group
     addBarrier() {
         let speedVariance =  Phaser.Math.Between(0, 50);
         let barrier = new Barrier(this, this.barrierSpeed - speedVariance);
@@ -79,15 +68,12 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        // make sure paddle is still alive
         if(!star.destroyed) {
-            // check for player input
             if(cursors.up.isDown) {
                 star.body.velocity.y -= starVelocity;
             } else if(cursors.down.isDown) {
                 star.body.velocity.y += starVelocity;
             }
-            // check for collisions
             this.physics.world.collide(star, this.barrierGroup, this.starCollision, null, this);
         }
 

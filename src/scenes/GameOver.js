@@ -4,30 +4,22 @@ class GameOver extends Phaser.Scene {
     }
 
     create() {
-        // check for high score in local storage
-        // uncomment console.log statements if you need to debug local storage
         if(localStorage.getItem('hiscore') != null) {
             let storedScore = parseInt(localStorage.getItem('hiscore'));
-            //console.log(`storedScore: ${storedScore}`);
-            // see if current score is higher than stored score
             if(level > storedScore) {
-                //console.log(`New high score: ${level}`);
                 localStorage.setItem('hiscore', level.toString());
                 highScore = level;
                 newHighScore = true;
             } else {
-                //console.log('No new high score :/');
                 highScore = parseInt(localStorage.getItem('hiscore'));
                 newHighScore = false;
             }
         } else {
-            //console.log('No high score stored. Creating new.');
             highScore = level;
             localStorage.setItem('hiscore', highScore.toString());
             newHighScore = true;
         }
 
-        // add GAME OVER text
         if(newHighScore) {
             this.add.text(centerX, centerY - textSpacer, 'New Hi-Score!', { fontSize: 66, fill: '#797EF6'}).setOrigin(0.5);
         }
@@ -36,16 +28,13 @@ class GameOver extends Phaser.Scene {
         this.add.text(centerX, centerY + textSpacer*2, `Press Space to Restart`, { fontSize: 46, fill: '#797E06'}).setOrigin(0.5);
         this.add.text(centerX, centerY + textSpacer*3, `Visual Assets By: Eric Ramirez | Music/SFX from Pixabay`, { fontSize: 22, fill: '#790EF6'}).setOrigin(0.5);
 
-        // set up cursor keys
         cursors = this.input.keyboard.createCursorKeys();
     }
 
     update() {
-        // wait for space input to restart game
         if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
             let textureManager = this.textures;
             console.log(textureManager)
-            // take snapshot of the entire game viewport (same as title screen)
             this.game.renderer.snapshot((snapshotImage) => {
                 console.log('took snapshot in GameOver')
                 if(textureManager.exists('titlesnapshot')) {
@@ -54,7 +43,6 @@ class GameOver extends Phaser.Scene {
                 textureManager.addImage('titlesnapshot', snapshotImage);
             });
 
-            // start next scene
             this.scene.start('playScene');
         }
     }
